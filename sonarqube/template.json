@@ -1,0 +1,72 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "DBInstanceIdentifier": {
+      "Type": "String",
+      "Description": "Database instance identifier"
+    },
+    "MasterUsername": {
+      "Type": "String",
+      "Description": "Master username for the PostgreSQL instance"
+    },
+    "MasterUserPassword": {
+      "Type": "String",
+      "Description": "Master user password for the PostgreSQL instance",
+      "NoEcho": true
+    },
+    "DBName": {
+      "Type": "String",
+      "Description": "Database name for the PostgreSQL instance"
+    },
+    "VPCSecurityGroupId": {
+      "Type": "String",
+      "Description": "VPC Security Group ID"
+    }
+    
+  },
+  "Resources": {
+    "PostgreSQLInstance": {
+      "Type": "AWS::RDS::DBInstance",
+      "Properties": {
+        "AllocatedStorage": "20",
+        "DBInstanceClass": "db.t3.micro",
+        "DBInstanceIdentifier": {
+          "Ref": "DBInstanceIdentifier"
+        },
+        "Engine": "postgres",
+        "EngineVersion": "13.3",
+        "MasterUsername": {
+          "Ref": "MasterUsername"
+        },
+        "MasterUserPassword": {
+          "Ref": "MasterUserPassword"
+        },
+        "DBName": {
+          "Ref": "DBName"
+        },
+        "VPCSecurityGroups": [
+          {
+            "Ref": "VPCSecurityGroupId"
+          }
+        ],
+        
+        "MultiAZ": false,
+        "PubliclyAccessible": false
+      }
+    }
+  },
+  "Outputs": {
+    "PostgreSQLEndpoint": {
+      "Value": {
+        "Fn::GetAtt": [
+          "PostgreSQLInstance",
+          "Endpoint.Address"
+        ]
+      },
+      "Export": {
+        "Name": "PostgreSQLEndpoint"
+      },
+      "Description": "The endpoint address of the PostgreSQL instance"
+    }
+  }
+}
