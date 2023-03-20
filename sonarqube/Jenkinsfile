@@ -20,8 +20,8 @@ node {
     stage('AWS CloudFormation Deploy PostgreSQL'){
     withAWS(region: 'us-east-1') {
         def stackName = "sonarqube-postgres-stack"
-        sh "aws cloudformation deploy --stack-name sonarqube-postgres-stack --template-file cloudformation/template.json --capabilities CAPABILITY_NAMED_IAM --parameter-overrides DBInstanceIdentifier=postgres MasterUsername=mypostgres MasterUserPassword=password DBName=mypostgres VPCSecurityGroupId=sg-0a83a506e3549a0e0 DBSubnetGroupName=my-subnet-group --region us-east-1
-"
+        sh "aws cloudformation deploy --stack-name ${stackName} --template-file template.json --capabilities CAPABILITY_NAMED_IAM --parameter-overrides DBInstanceIdentifier=postgres MasterUsername=mypostgres MasterUserPassword=password DBName=mypostgres VPCSecurityGroupId=sg-0a83a506e3549a0e0 DBSubnetGroupName=my-subnet-group --region us-east-1"
+
         def stackOutput = sh(returnStdout: true, script: "aws cloudformation describe-stacks --stack-name ${stackName} --query 'Stacks[0].Outputs[0].OutputValue' --output text --region us-east-1").trim()
         env.SONAR_JDBC_URL = "jdbc:postgresql://${stackOutput}:5432/mypostgres"
         }
