@@ -28,6 +28,7 @@ node {
     }
 
     stage('Deploy SonarQube ${props.SONARQUBE_VERSION} into ${params.BUILDENV}'){
+        def props = readProperties file: 'sonarqube/build.properties'
         docker.withRegistry(props.MSR, props.MSRCREDS){
             def sonarImage = docker.image("fdjapi10/sonarqube:${params.BUILDENV}-${props.SONARQUBE_VERSION}")
             sonarImage.pull()
