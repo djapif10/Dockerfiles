@@ -3,31 +3,26 @@ node {
         checkout scm
         def props = readProperties file: 'sonarqube/build.properties'
 
-        sh "wget https://raw.githubusercontent.com/alpinelinux/docker-alpine/v${props.ALPINE_VERSION}/x86_64/Dockerfile -O Dockerfile"
-        def ROOTFS = readFile('Dockerfile').readLines()[1].split()[1]
-        sh "wget https://github.com/alpinelinux/docker-alpine/raw/v${props.ALPINE_VERSION}/x86_64/${ROOTFS} -O ${ROOTFS}"
-        docker.build('fresh')
         echo "Docker Registry URL: ${props.MSR}"
         docker.withRegistry(props.MSR, props.MSRCREDS){
             docker.build("fdjapi10/sonarqube:${params.BUILDENV}-${props.SONARQUBE_VERSION}",
-            "--build-arg  ALPINE_VERSION=${props.ALPINE_VERSION} \
-            --build-arg JAVA_VERSION=${props.JAVA_VERSION} \
+            "--build-arg JAVA_VERSION=${props.JAVA_VERSION} \
             --build-arg SONARQUBE_VERSION=${props.SONARQUBE_VERSION} \
             sonarqube/").push()
         }
     }
-                
-    stage('AWS CloudFormation Deploy PostgreSQL'){
-    withAWS(region: 'us-east-1') {
-        def stackName = "sonarqube-postgres-stack"
-        sh "aws cloudformation deploy --stack-name ${stackName} --template-file sonarqube/template.json --capabilities CAPABILITY_NAMED_IAM --parameter-overrides DBInstanceIdentifier=postgres MasterUsername=mypostgres MasterUserPassword=password DBName=mypostgres VPCSecurityGroupId=sg-0a83a506e3549a0e0 DBSubnetGroupName=my-subnet-group --region us-east-1"
 
-        def stackOutput = sh(returnStdout: true, script: "aws cloudformation describe-stacks --stack-name ${stackName} --query 'Stacks[0].Outputs[0].OutputValue' --output text --region us-east-1").trim()
-        env.SONAR_JDBC_URL = "jdbc:postgresql://${stackOutput}:5432/mypostgres"
+    stage('AWS CloudFormation Deploy PostgreSQL'){
+        withAWS(region: 'us-east-1') {
+            def stackName = "sonarqube-postgres-stack"
+            sh "aws cloudformation deploy --stack-name ${stackName} --template-file sonarqube/template.json --capabilities CAPABILITY_NAMED_IAM --parameter-overrides DBInstanceIdentifier=postgres MasterUsername=mypostgres MasterUserPassword=password DBName=mypostgres VPCSecurityGroupId=sg-0a83a506e3549a0e0 DBSubnetGroupName=my-subnet-group --region us-east-1"
+
+            def stackOutput = sh(returnStdout: true, script: "aws cloudformation describe-stacks --stack-name ${stackName} --query 'Stacks[0].Outputs[0].OutputValue' --output text --region us-east-1").trim()
+            env.SONAR_JDBC_URL = "jdbc:postgresql://${stackOutput}:5432/mypostgres"
         }
     }
 
-    stage('Deploy SonarQube ${props.SONARQUBE_VERSION} into ${params.BUILDENV}'){
+    stage("Deploy SonarQube ${props.SONARQUBE_VERSION} into ${params.BUILDENV}"){
         def props = readProperties file: 'sonarqube/build.properties'
         docker.withRegistry(props.MSR, props.MSRCREDS){
             def sonarImage = docker.image("fdjapi10/sonarqube:${params.BUILDENV}-${props.SONARQUBE_VERSION}")
@@ -47,5 +42,5 @@ node {
                 sh "echo 'SonarQube is up and running'"
             }
         }
-    }                     
+    }
 }
