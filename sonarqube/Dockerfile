@@ -1,3 +1,10 @@
+# Build properties
+ARG ALPINE_VERSION=3.17
+ARG SONARQUBE_VERSION=9.9.0.65466
+ARG MSR=https://hub.docker.com/
+ARG MSRCREDS=dockerhub-creds
+ARG JAVA_VERSION=17
+
 # Use the official Eclipse Temurin image as the base image
 FROM eclipse-temurin:${JAVA_VERSION}-jre AS build
 
@@ -46,4 +53,3 @@ USER sonarqube
 
 # Set the entrypoint
 ENTRYPOINT ["./bin/linux-x86-64/sonar.sh", "start"]
-
