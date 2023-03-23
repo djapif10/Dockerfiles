@@ -17,6 +17,8 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/community" >> 
 
 # Update the package list
 RUN apk update
+RUN apk add --update --no-cache openjdk17
+
 
 # Download OpenJDK
 RUN wget -O /tmp/openjdk.tar.gz "https://download.java.net/java/GA/jdk${JAVA_VERSION}/${BUILD_NUMBER}/GPL/openjdk-${JAVA_VERSION}_linux-x64_bin.tar.gz"
