@@ -36,7 +36,8 @@ node {
 
     stage("Deploy SonarQube ${props.SONARQUBE_VERSION} into ${params.BUILDENV}"){
         docker.withRegistry(props.MSR, props.MSRCREDS){
-            def sonarImage = docker.image("fdjapi10/sonarqube:${params.BUILDENV}-${props.SONARQUBE_VERSION}")
+            def sonarImage = docker.image("fdjapi10/sonarqube:${params.BUILDENV}-${props.SONARQUBE_VERSION}".toLowerCase())
+
             sonarImage.pull()
             sonarImage.withRun("--name sonarqube-${params.BUILDENV} \
                 -p 9000:9000 \
