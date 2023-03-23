@@ -6,32 +6,28 @@ ARG MSRCREDS=dockerhub-creds
 ARG JAVA_VERSION=17
 
 # Use the official Eclipse Temurin image as the base image
-FROM openjdk:17-jre-slim-buster
+FROM eclipse-temurin:17-jdk-alpine AS build-env
 
 # Set environment variables
 ENV SONARQUBE_HOME=/opt/sonarqube \
     SONARQUBE_VERSION=${SONARQUBE_VERSION}
 
-
 # Download and extract SonarQube
 ARG SONARQUBE_VERSION
 ARG SONARQUBE_DOWNLOAD_URL=https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-${SONARQUBE_VERSION}.zip
 
-RUN apt-get update && \
-    apt-get install -y curl unzip && \
-    rm -rf /var/lib/apt/lists/* && \
+RUN apk add --update --no-cache curl unzip && \
     curl -L -o sonarqube.zip ${SONARQUBE_DOWNLOAD_URL} && \
     unzip sonarqube.zip && \
     rm sonarqube.zip && \
     mv sonarqube-${SONARQUBE_VERSION} sonarqube
 
 # Create user and group for SonarQube
-RUN groupadd --system --gid 1000 sonarqube && \
-    useradd --system --uid 1000 --gid sonarqube sonarqube
+RUN addgroup -S -g 1000 sonarqube && \
+    adduser -S -u 1000 -G sonarqube sonarqube
 
 # Copy sonar.properties
 COPY sonar.properties ${SONARQUBE_HOME}/conf/sonar.properties
-
 # Set environment variables for JDBC and other configurations
 ENV SONAR_HOST_URL= \
     SONAR_JDBC_URL= \
