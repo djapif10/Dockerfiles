@@ -5,7 +5,9 @@ node {
 
         echo "Docker Registry URL: ${props.MSR}"
         
-        sh "docker login -u ${props.MSRCREDS_USR} -p ${props.MSRCREDS_PSW} ${props.MSR}"
+        withCredentials([usernamePassword(credentialsId: props.MSRCREDS, passwordVariable: 'password', usernameVariable: 'username')]) {
+            sh "docker login -u ${username} -p ${password} ${props.MSR}"
+        }
         
         sh "docker build \
             --build-arg ALPINE_VERSION=${props.ALPINE_VERSION} \
