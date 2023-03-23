@@ -1,6 +1,9 @@
 # Build properties
 ARG ALPINE_VERSION=3.17
 ARG SONARQUBE_VERSION=9.9.0.65466
+ARG MSR=https://hub.docker.com/
+ARG MSRCREDS=dockerhub-creds
+ARG JAVA_VERSION=17
 ARG SONARQUBE_DOWNLOAD_URL=https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-${SONARQUBE_VERSION}.zip
 
 # Use the official Eclipse Temurin image as the base image
