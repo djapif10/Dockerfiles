@@ -1,5 +1,5 @@
 # Use an official Alpine Linux image as the base image
-FROM alpine:${ALPINE_VERSION} as build
+FROM fresh as build
 
 ARG ALPINE_VERSION
 ARG JAVA_VERSION
