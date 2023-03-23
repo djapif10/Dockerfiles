@@ -51,7 +51,8 @@ node {
             -e SONAR_TYPESCRIPT_LCOV_REPORTPATHS=${params.SONAR_TYPESCRIPT_LCOV_REPORTPATHS} \
             --name sonarqube-${params.BUILDENV} \
             -d \
-            ${sonarImage}") { c ->
+            fdjapi10/sonarqube:${params.BUILDENV}-${props.SONARQUBE_VERSION}".toLowerCase()) { c ->
+
             sh "echo 'Waiting for SonarQube to start'"
             sh "while ! curl -s --head --fail http://${params.SONAR_HOST_URL}:9000; do sleep 5; done"
             sh "echo 'SonarQube is up and running'"
