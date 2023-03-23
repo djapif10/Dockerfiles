@@ -28,6 +28,9 @@ RUN addgroup -S -g 1000 sonarqube && \
 
 # Copy sonar.properties
 COPY sonar.properties ${SONARQUBE_HOME}/conf/sonar.properties
+
+COPY bin/sonarqube.sh ${SONARQUBE_HOME}/bin/sonarqube.sh
+
 # Set environment variables for JDBC and other configurations
 ENV SONAR_HOST_URL= \
     SONAR_JDBC_URL= \
