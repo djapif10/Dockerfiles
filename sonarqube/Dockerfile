@@ -18,7 +18,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Download and extract SonarQube
-ADD https://binaries.sonarsource.com/commercialDistribution/sonarqube-enterprise-${SONARQUBE_VERSION}.zip /opt/sonarqube-enterprise-${SONARQUBE_VERSION}.zip
+ADD https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-${SONARQUBE_VERSION}.zip /opt/sonarqube-enterprise-${SONARQUBE_VERSION}.zip
 RUN unzip /opt/sonarqube-enterprise-${SONARQUBE_VERSION}.zip -d /opt/ && \
     mv /opt/sonarqube-enterprise-${SONARQUBE_VERSION} ${SONARQUBE_HOME} && \
     rm /opt/sonarqube-enterprise-${SONARQUBE_VERSION}.zip
