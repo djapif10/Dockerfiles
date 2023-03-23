@@ -1,7 +1,10 @@
 node {
+    def props = readProperties file: 'sonarqube/build.properties'
+    
     stage('Build Fresh Image Sonarqube'){
+        
         checkout scm
-        def props = readProperties file: 'sonarqube/build.properties'
+        
 
         echo "Docker Registry URL: ${props.MSR}"
         
