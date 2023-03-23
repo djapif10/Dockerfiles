@@ -5,18 +5,17 @@ ARG MSR=https://registry-1.docker.io/
 ARG MSRCREDS=dockerhub-creds
 ARG JAVA_VERSION=17
 
-# Use the official Eclipse Temurin image as the base image
-FROM eclipse-temurin:17-jdk-alpine AS build-env
+# Use Alpine Linux 3.17 with OpenJDK 17 as the base image
+FROM alpine:3.17 AS build-env
+RUN apk --no-cache add openjdk17
 
 # Set environment variables
 ENV SONARQUBE_HOME=/opt/sonarqube \
-    SONARQUBE_VERSION=${SONARQUBE_VERSION}
+    SONARQUBE_VERSION=9.9.0.65466
 
 # Download and extract SonarQube
-ARG SONARQUBE_VERSION
 ARG SONARQUBE_DOWNLOAD_URL=https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-${SONARQUBE_VERSION}.zip
-
-RUN apk add --update --no-cache curl unzip && \
+RUN apk --no-cache add curl unzip && \
     curl -L -o sonarqube.zip ${SONARQUBE_DOWNLOAD_URL} && \
     unzip sonarqube.zip && \
     rm sonarqube.zip && \
