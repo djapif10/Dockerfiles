@@ -4,18 +4,24 @@ node {
         def props = readProperties file: 'sonarqube/build.properties'
 
         echo "Docker Registry URL: ${props.MSR}"
-        docker.withRegistry(props.MSR, props.MSRCREDS){
-            sh "docker build \
-                --build-arg ALPINE_VERSION=${props.ALPINE_VERSION} \
-                --build-arg SONARQUBE_VERSION=${props.SONARQUBE_VERSION} \
-                --build-arg MSR=${props.MSR} \
-                --build-arg MSRCREDS=${props.MSRCREDS} \
-                --build-arg JAVA_VERSION=${props.JAVA_VERSION} \
-                -t fdjapi10/sonarqube:${params.BUILDENV}-${props.SONARQUBE_VERSION} \
-                sonarqube/"
-            sh "docker push fdjapi10/sonarqube:${params.BUILDENV}-${props.SONARQUBE_VERSION}"
-        }
+        
+        sh "docker login -u ${props.MSRCREDS_USR} -p ${props.MSRCREDS_PSW} ${props.MSR}"
+        
+        sh "docker build \
+            --build-arg ALPINE_VERSION=${props.ALPINE_VERSION} \
+            --build-arg SONARQUBE_VERSION=${props.SONARQUBE_VERSION} \
+            --build-arg MSR=${props.MSR} \
+            --build-arg MSRCREDS=${props.MSRCREDS} \
+            --build-arg JAVA_VERSION=${props.JAVA_VERSION} \
+            -t fdjapi10/sonarqube:${params.BUILDENV}-${props.SONARQUBE_VERSION} \
+            sonarqube/"
+        
+        sh "docker push fdjapi10/sonarqube:${params.BUILDENV}-${props.SONARQUBE_VERSION}"
+        
+        sh "docker logout ${props.MSR}"
     }
+
+
 
     stage('AWS CloudFormation Deploy PostgreSQL'){
         withAWS(region: 'us-east-1') {
