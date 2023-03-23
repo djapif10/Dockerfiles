@@ -13,19 +13,18 @@ ENV SONARQUBE_HOME=/opt/sonarqube \
     SONARQUBE_VERSION=${SONARQUBE_VERSION}
 
 # Install necessary packages
-RUN apt-get update && \
-    apt-get install -y curl unzip && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk --no-cache add curl unzip
 
 # Download and extract SonarQube
-ADD https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-${SONARQUBE_VERSION}.zip /opt/sonarqube-enterprise-${SONARQUBE_VERSION}.zip
-RUN unzip /opt/sonarqube-enterprise-${SONARQUBE_VERSION}.zip -d /opt/ && \
-    mv /opt/sonarqube-enterprise-${SONARQUBE_VERSION} ${SONARQUBE_HOME} && \
-    rm /opt/sonarqube-enterprise-${SONARQUBE_VERSION}.zip
+ARG SONARQUBE_DOWNLOAD_URL=https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-${SONARQUBE_VERSION}.zip
+RUN curl -L -o sonarqube.zip ${SONARQUBE_DOWNLOAD_URL} \
+    && unzip sonarqube.zip \
+    && rm sonarqube.zip \
+    && mv sonarqube-${SONARQUBE_VERSION} ${SONARQUBE_HOME}
 
 # Create user and group for SonarQube
-RUN groupadd --system --gid 1000 sonarqube && \
-    useradd --system --uid 1000 --gid sonarqube sonarqube
+RUN addgroup -S sonarqube && \
+    adduser -S -G sonarqube sonarqube
 
 # Copy sonar.properties
 COPY sonar.properties ${SONARQUBE_HOME}/conf/sonar.properties
