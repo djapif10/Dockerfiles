@@ -35,28 +35,31 @@ node {
     }
 
     stage("Deploy SonarQube ${props.SONARQUBE_VERSION} into ${params.BUILDENV}"){
-        docker.withRegistry(props.MSR, props.MSRCREDS){
-            def sonarImage = docker.image("fdjapi10/sonarqube:${params.BUILDENV}-${props.SONARQUBE_VERSION}".toLowerCase())
+    docker.withRegistry(props.MSR, props.MSRCREDS){
+        def sonarImage = docker.image("fdjapi10/sonarqube:${params.BUILDENV}-${props.SONARQUBE_VERSION}".toLowerCase())
 
-            sonarImage.pull()
-            sonarImage.withRun("--name sonarqube-${params.BUILDENV} \
-                -p 9000:9000 \
-                -e SONAR_HOST_URL=${params.SONAR_HOST_URL} \
-                -e SONAR_JDBC_URL=${env.SONAR_JDBC_URL} \
-                -e SONAR_JDBC_USERNAME=mypostgres \
-                -e SONAR_JDBC_PASSWORD=password \
-                -e SONAR_SECURITY_REALM=${params.SONAR_SECURITY_REALM} \
-                -e SONAR_SECURITY_SAVEPASSWORD=${params.SONAR_SECURITY_SAVEPASSWORD} \
-                -e SONAR_TYPESCRIPT_LCOV_REPORTPATHS=${params.SONAR_TYPESCRIPT_LCOV_REPORTPATHS} \
-                -d \
-                ${sonarImage}") { c ->
-                sh "echo 'Waiting for SonarQube to start'"
-                sh "while ! curl -s --head --fail http://${params.SONAR_HOST_URL}:9000; do sleep 5; done"
-                sh "echo 'SonarQube is up and running'"
-                }
-            }               
+        sonarImage.pull()
+        sh "docker stop sonarqube-${params.BUILDENV} || true"
+        sh "docker rm sonarqube-${params.BUILDENV} || true"
+        sonarImage.withRun("-p 9000:9000 \
+            -e SONAR_HOST_URL=${params.SONAR_HOST_URL} \
+            -e SONAR_JDBC_URL=${env.SONAR_JDBC_URL} \
+            -e SONAR_JDBC_USERNAME=mypostgres \
+            -e SONAR_JDBC_PASSWORD=password \
+            -e SONAR_SECURITY_REALM=${params.SONAR_SECURITY_REALM} \
+            -e SONAR_SECURITY_SAVEPASSWORD=${params.SONAR_SECURITY_SAVEPASSWORD} \
+            -e SONAR_TYPESCRIPT_LCOV_REPORTPATHS=${params.SONAR_TYPESCRIPT_LCOV_REPORTPATHS} \
+            --name sonarqube-${params.BUILDENV} \
+            -d \
+            ${sonarImage}") { c ->
+            sh "echo 'Waiting for SonarQube to start'"
+            sh "while ! curl -s --head --fail http://${params.SONAR_HOST_URL}:9000; do sleep 5; done"
+            sh "echo 'SonarQube is up and running'"
+            }
+        }               
             
-        }
+    }
+
 
             
 
