@@ -10,14 +10,8 @@ node {
             sh "docker login -u ${username} -p ${password} ${props.MSR}"
         }
         
-        sh "docker build \
-            --build-arg ALPINE_VERSION=${props.ALPINE_VERSION} \
-            --build-arg SONARQUBE_VERSION=${props.SONARQUBE_VERSION} \
-            --build-arg MSR=${props.MSR} \
-            --build-arg MSRCREDS=${props.MSRCREDS} \
-            --build-arg JAVA_VERSION=${props.JAVA_VERSION} \
-            -t fdjapi10/sonarqube:${params.BUILDENV}-${props.SONARQUBE_VERSION} \
-            sonarqube/"
+        sh "docker build --build-arg ALPINE_VERSION=3.17 --build-arg SONARQUBE_VERSION=9.9.0.65466 --build-arg MSR=https://registry-1.docker.io/ --build-arg MSRCREDS=dockerhub-creds --build-arg JAVA_VERSION=17 --build-arg BUILD_NUMBER=49 -t fdjapi10/sonarqube:staging-9.9.0.65466 sonarqube/"
+
         
         sh "docker push fdjapi10/sonarqube:${params.BUILDENV}-${props.SONARQUBE_VERSION}"
         
