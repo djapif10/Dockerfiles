@@ -14,9 +14,7 @@ ENV SONARQUBE_HOME=/opt/sonarqube \
     SONARQUBE_VERSION=${SONARQUBE_VERSION}
 
 # Install necessary packages
-RUN apk update && \
-    apk add --no-cache curl unzip && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl unzip && rm -rf /var/lib/apt/lists/*
 
 # Download and extract SonarQube
 RUN curl -L -o sonarqube.zip ${SONARQUBE_DOWNLOAD_URL} \
